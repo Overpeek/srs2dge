@@ -11,7 +11,8 @@ pub mod ty;
 
 //
 
-const USAGE: u32 = BufferUsages::VERTEX.bits() | BufferUsages::COPY_DST.bits();
+const USAGE: u32 =
+    BufferUsages::VERTEX.bits() | BufferUsages::COPY_SRC.bits() | BufferUsages::COPY_DST.bits();
 
 //
 

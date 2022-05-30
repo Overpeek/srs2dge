@@ -37,7 +37,11 @@ impl Mesh<DefaultVertex> for PlayerMesh {
         IntoIterator::into_iter([offset, offset + 1, offset + 2, offset + 3, offset, !0])
     }
 
-    fn index_step(&self) -> u32 {
+    fn vbo_alloc(&self) -> u32 {
         4
+    }
+
+    fn ibo_alloc(&self) -> u32 {
+        6
     }
 }

@@ -27,6 +27,7 @@ pub struct Frame {
     main_format: TextureFormat,
     main_dim: (u32, u32),
 
+    prepare_encoder: CommandEncoder,
     encoder: Option<CommandEncoder>,
 
     queue: Arc<Queue>,
@@ -53,6 +54,8 @@ impl Frame {
         let main_format = surface.format();
         let main_dim = surface.get_dim();
 
+        let prepare_encoder =
+            device.create_command_encoder(&CommandEncoderDescriptor { label: label!() });
         let encoder = device.create_command_encoder(&CommandEncoderDescriptor { label: label!() });
 
         let main_texture = Some(main_texture);
@@ -64,6 +67,7 @@ impl Frame {
             main_format,
             main_dim,
 
+            prepare_encoder,
             encoder,
 
             queue,
@@ -157,22 +161,23 @@ impl Frame {
         size: BufferSize,
         device: &Device,
     ) -> BufferViewMut {
-        self.belt.write_buffer(
-            self.encoder.as_mut().expect("Frame was dropped"),
-            target,
-            offset,
-            size,
-            device,
-        )
+        self.belt
+            .write_buffer(&mut self.prepare_encoder, target, offset, size, device)
     }
+
+    /* pub(crate) fn prepare_encoder(&mut self) -> &mut CommandEncoder {
+        &mut self.prepare_encoder
+    } */
 
     pub(crate) fn finish(mut self) -> StagingBelt {
         self.belt.finish();
-        self.queue.submit([self
-            .encoder
-            .take()
-            .expect("Frame was dropped twice")
-            .finish()]);
+        self.queue.submit([
+            self.prepare_encoder.finish(),
+            self.encoder
+                .take()
+                .expect("Frame was dropped twice")
+                .finish(),
+        ]);
         self.main_texture
             .take()
             .expect("Frame was dropped twice")

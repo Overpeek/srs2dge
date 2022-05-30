@@ -1,10 +1,12 @@
 use crate::{
     color::Color,
-    prelude::{DefaultVertex, Mesh, TexturePosition},
+    prelude::{DefaultVertex, TexturePosition},
 };
 use glam::{Vec2, Vec3, Vec3Swizzles, Vec4, Vec4Swizzles};
 use std::array::IntoIter;
 use wgpu::PrimitiveTopology;
+
+use super::mesh::Mesh;
 
 //
 
@@ -56,8 +58,12 @@ impl Mesh<DefaultVertex> for QuadMesh {
         IntoIterator::into_iter([offset, offset + 1, offset + 2, offset + 3, !0])
     }
 
-    fn index_step(&self) -> u32 {
+    fn vbo_alloc(&self) -> u32 {
         4
+    }
+
+    fn ibo_alloc(&self) -> u32 {
+        5
     }
 }
 
@@ -81,7 +87,11 @@ impl Mesh<DefaultVertex> for IsoQuadMesh {
         IntoIterator::into_iter([offset, offset + 1, offset + 2, offset + 3, !0])
     }
 
-    fn index_step(&self) -> u32 {
+    fn vbo_alloc(&self) -> u32 {
         4
+    }
+
+    fn ibo_alloc(&self) -> u32 {
+        5
     }
 }

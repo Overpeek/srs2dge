@@ -5,11 +5,11 @@ use legion::{
 use plugin::Plugin;
 use prelude::time::Time;
 use srs2dge_core::{
-    batch::BatchRenderer,
     main_game_loop::{
         report::Reporter,
         update::{UpdateLoop, UpdateRate},
     },
+    prelude::BatchRenderer,
     target::Target,
 };
 use std::{

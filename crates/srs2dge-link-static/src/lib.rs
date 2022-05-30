@@ -28,3 +28,8 @@ pub mod res {
 pub mod ecs {
     pub use srs2dge_ecs::prelude::*;
 }
+
+#[cfg(feature = "gui")]
+pub mod gui {
+    // TODO: pub use srs2dge_gui::prelude::*;
+}

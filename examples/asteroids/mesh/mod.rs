@@ -50,11 +50,19 @@ impl Mesh<DefaultVertex> for MultiMesh {
         }
     }
 
-    fn index_step(&self) -> u32 {
+    fn vbo_alloc(&self) -> u32 {
         match self {
-            MultiMesh::Player(mesh) => mesh.index_step(),
-            MultiMesh::Bullet(mesh) => mesh.index_step(),
-            MultiMesh::Asteroid(mesh) => mesh.index_step(),
+            MultiMesh::Player(mesh) => mesh.vbo_alloc(),
+            MultiMesh::Bullet(mesh) => mesh.vbo_alloc(),
+            MultiMesh::Asteroid(mesh) => mesh.vbo_alloc(),
+        }
+    }
+
+    fn ibo_alloc(&self) -> u32 {
+        match self {
+            MultiMesh::Player(mesh) => mesh.ibo_alloc(),
+            MultiMesh::Bullet(mesh) => mesh.ibo_alloc(),
+            MultiMesh::Asteroid(mesh) => mesh.ibo_alloc(),
         }
     }
 }

@@ -30,10 +30,14 @@ fn bullet_mesh(
     transform: &Transform2D,
     #[resource] batcher: &mut BatchRenderer<MultiMesh>,
 ) {
-    if let Some(MultiMesh::Bullet(mesh)) = batcher.get_mut(bullet.idx) {
-        mesh.middle = transform.translation;
-        mesh.radius = transform.scale;
-    }
+    batcher.modify(
+        MultiMesh::Bullet(GizmosCircle {
+            middle: transform.translation,
+            radius: transform.scale,
+            col: Color::WHITE,
+        }),
+        bullet.idx,
+    );
 }
 
 #[system(for_each)]

@@ -1,4 +1,9 @@
-use crate::{bullet::Bullet, collider::Collider, mesh::MultiMesh, Settings};
+use crate::{
+    bullet::Bullet,
+    collider::Collider,
+    mesh::{player::PlayerMesh, MultiMesh},
+    Settings,
+};
 use legion::{system, systems::CommandBuffer};
 
 use srs2dge::prelude::*;
@@ -32,9 +37,12 @@ fn player_mesh(
     transform: &Transform2D,
     #[resource] batcher: &mut BatchRenderer<MultiMesh>,
 ) {
-    if let Some(MultiMesh::Player(mesh)) = batcher.get_mut(player.idx) {
-        mesh.lerp_transform = *transform
-    }
+    batcher.modify(
+        MultiMesh::Player(PlayerMesh {
+            lerp_transform: *transform,
+        }),
+        player.idx,
+    );
 }
 
 #[cfg_attr(target_arch = "wasm32", system(for_each))]

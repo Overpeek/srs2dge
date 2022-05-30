@@ -10,6 +10,7 @@ pub struct Sprite {
     pub sprite: TexturePosition,
     pub color: Color,
 
+    #[serde(skip)]
     pub idx: Option<Idx>,
 
     pub lerp_transform: Transform2D,
@@ -56,25 +57,16 @@ fn set_pos_body(
 #[filter(maybe_changed::<Sprite>())]
 fn set_sprite(sprite: &mut Sprite, #[resource] batcher: &mut BatchRenderer) {
     // println!("set sprite");
+    let mesh = QuadMesh {
+        pos: sprite.lerp_transform.translation,
+        size: sprite.lerp_transform.scale,
+        col: sprite.color,
+        tex: sprite.sprite,
+    };
+
     if let Some(idx) = sprite.idx {
-        let mesh = batcher.get(idx).unwrap();
-        if mesh.pos != sprite.lerp_transform.translation
-            || mesh.size != sprite.lerp_transform.scale
-            || mesh.col != sprite.color
-            || mesh.tex != sprite.sprite
-        {
-            let mesh = batcher.get_mut(idx).unwrap();
-            mesh.pos = sprite.lerp_transform.translation;
-            mesh.size = sprite.lerp_transform.scale;
-            mesh.col = sprite.color;
-            mesh.tex = sprite.sprite;
-        }
+        batcher.modify(mesh, idx);
     } else {
-        sprite.idx = Some(batcher.push_with(QuadMesh {
-            pos: sprite.lerp_transform.translation,
-            size: sprite.lerp_transform.scale,
-            col: sprite.color,
-            tex: sprite.sprite,
-        }));
+        sprite.idx = Some(batcher.push_with(mesh));
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
     buffer::{index::Index, IndexBuffer, Vertex, VertexBuffer},
-    shader::Shader,
+    shader::{BindUnit, Shader},
 };
 use std::{marker::PhantomData, ops::Range};
 use wgpu::{BindGroup, TextureFormat};
@@ -19,25 +19,23 @@ pub struct RenderPass<'e, Sv = (), Bv = (), Si = (), Bi = (), const PIPELINE_BOU
 impl<'e, Sv, Bv, Si, Bi, const PIPELINE_BOUND: bool>
     RenderPass<'e, Sv, Bv, Si, Bi, PIPELINE_BOUND>
 {
-    pub fn bind_vbo<'b, T>(
+    pub fn bind_vbo<T>(
         mut self,
-        buffer: &'b VertexBuffer<T>,
+        buffer: &'e VertexBuffer<T>,
         // slot: u32,
     ) -> RenderPass<'e, Sv, T, Si, Bi, PIPELINE_BOUND>
     where
-        'b: 'e,
         T: Vertex + 'static,
     {
         self.inner.set_vertex_buffer(0, buffer.inner().slice(..));
         self.pass()
     }
 
-    pub fn bind_ibo<'b, T>(
+    pub fn bind_ibo<T>(
         mut self,
-        buffer: &'b IndexBuffer<T>,
+        buffer: &'e IndexBuffer<T>,
     ) -> RenderPass<'e, Sv, Bv, Si, T, PIPELINE_BOUND>
     where
-        'b: 'e,
         T: Index + 'static,
     {
         self.inner
@@ -45,12 +43,19 @@ impl<'e, Sv, Bv, Si, Bi, const PIPELINE_BOUND: bool>
         self.pass()
     }
 
-    pub fn bind_shader<'s, V, I>(
+    pub fn bind_unit<V, I>(self, unit: &'e BindUnit<V, I>) -> RenderPass<'e, V, Bv, I, Bi, true>
+    where
+        V: Vertex + 'static,
+        I: Index + 'static,
+    {
+        self.bind_group(&unit.0).bind_shader(unit.1)
+    }
+
+    pub fn bind_shader<V, I>(
         mut self,
-        shader: &'s Shader<V, I>,
+        shader: &'e Shader<V, I>,
     ) -> RenderPass<'e, V, Bv, I, Bi, true>
     where
-        's: 'e,
         V: Vertex + 'static,
         I: Index + 'static,
     {
@@ -62,10 +67,7 @@ impl<'e, Sv, Bv, Si, Bi, const PIPELINE_BOUND: bool>
         self.pass()
     }
 
-    pub fn bind_group<'g>(mut self, bind_group: &'g BindGroup) -> Self
-    where
-        'g: 'e,
-    {
+    pub fn bind_group(mut self, bind_group: &'e BindGroup) -> Self {
         self.inner.set_bind_group(0, bind_group, &[]);
         self.pass()
     }

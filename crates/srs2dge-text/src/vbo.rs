@@ -1,8 +1,12 @@
 use super::{format::FString, pos_iter::CharPositionIter};
 use crate::glyphs::Glyphs;
 use srs2dge_core::{
-    batch::Mesh, buffer::DefaultVertex, color::Color, glam::Vec2, image::RgbaImage,
-    prelude::QuadMesh, target::Target,
+    buffer::DefaultVertex,
+    color::Color,
+    glam::Vec2,
+    image::RgbaImage,
+    prelude::{Mesh, QuadMesh},
+    target::Target,
 };
 
 //
@@ -83,7 +87,7 @@ pub fn text(
         .into_iter()
         .flat_map(|mesh| {
             let offset = i;
-            i += mesh.index_step();
+            i += mesh.vbo_alloc();
             mesh.indices(offset)
         })
         .collect();

@@ -1,6 +1,6 @@
 use self::builder::ShaderBuilder;
 use crate::buffer::{index::Index, vertex::Vertex};
-use std::marker::PhantomData;
+use std::{marker::PhantomData, ops::Deref};
 use wgpu::{BindGroup, BindGroupLayout, Device, RenderPipeline, TextureFormat};
 
 //
@@ -30,6 +30,27 @@ pub trait Layout<'a> {
 
     fn bind_group_layout(device: &Device) -> BindGroupLayout;
     fn bind_group(&self, bindings: Self::Bindings) -> BindGroup;
+}
+
+pub type BindUnit<'a, V, I> = (BindGroup, &'a Shader<V, I>);
+
+pub trait AsBindUnit<V, I, B>
+where
+    V: Vertex,
+    I: Index,
+{
+    fn bind_unit(&self, bindings: B) -> BindUnit<V, I>;
+}
+
+impl<'a, T, V, I> AsBindUnit<V, I, T::Bindings> for T
+where
+    T: Deref<Target = Shader<V, I>> + Layout<'a>,
+    V: Vertex,
+    I: Index,
+{
+    fn bind_unit(&self, bindings: T::Bindings) -> BindUnit<V, I> {
+        (self.bind_group(bindings), self.deref())
+    }
 }
 
 //

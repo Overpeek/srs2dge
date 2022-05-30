@@ -59,7 +59,11 @@ impl Mesh<DefaultVertex> for AsteroidMesh {
         Box::new((0..RES).chain([0]).map(move |i| i + offset).chain([!0]))
     }
 
-    fn index_step(&self) -> u32 {
+    fn vbo_alloc(&self) -> u32 {
         RES
+    }
+
+    fn ibo_alloc(&self) -> u32 {
+        RES + 2
     }
 }

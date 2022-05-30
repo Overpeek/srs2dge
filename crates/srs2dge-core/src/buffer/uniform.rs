@@ -3,7 +3,8 @@ use wgpu::BufferUsages;
 
 //
 
-const USAGE: u32 = BufferUsages::UNIFORM.bits() | BufferUsages::COPY_DST.bits();
+const USAGE: u32 =
+    BufferUsages::UNIFORM.bits() | BufferUsages::COPY_SRC.bits() | BufferUsages::COPY_DST.bits();
 
 //
 

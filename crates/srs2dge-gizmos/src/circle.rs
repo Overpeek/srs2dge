@@ -54,8 +54,12 @@ impl Mesh<DefaultVertex> for GizmosCircle {
         GizmosCircleIndexIter { i: 0, offset }
     }
 
-    fn index_step(&self) -> u32 {
+    fn vbo_alloc(&self) -> u32 {
         RES
+    }
+
+    fn ibo_alloc(&self) -> u32 {
+        RES + 2
     }
 }
 
@@ -158,7 +162,7 @@ impl GizmosCircles {
             .drain(..)
             .flat_map(|line| {
                 let offset = i;
-                i += line.index_step();
+                i += line.vbo_alloc();
                 line.indices(offset)
             })
             .collect();

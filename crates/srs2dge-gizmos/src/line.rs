@@ -44,7 +44,11 @@ impl Mesh<DefaultVertex> for GizmosLine {
         IntoIterator::into_iter([offset, offset + 1])
     }
 
-    fn index_step(&self) -> u32 {
+    fn vbo_alloc(&self) -> u32 {
+        2
+    }
+
+    fn ibo_alloc(&self) -> u32 {
         2
     }
 }
@@ -93,7 +97,7 @@ impl GizmosLines {
             .drain(..)
             .flat_map(|line| {
                 let offset = i;
-                i += line.index_step();
+                i += line.vbo_alloc();
                 line.indices(offset)
             })
             .collect();

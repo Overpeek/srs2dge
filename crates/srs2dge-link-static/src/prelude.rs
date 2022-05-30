@@ -16,3 +16,6 @@ pub use crate::res;
 
 #[cfg(feature = "ecs")]
 pub use crate::ecs::*;
+
+#[cfg(feature = "gui")]
+pub use crate::gui::*;

@@ -1,4 +1,7 @@
-use crate::{collider::Collider, mesh::MultiMesh};
+use crate::{
+    collider::Collider,
+    mesh::{asteroid::AsteroidMesh, MultiMesh},
+};
 use instant::{Duration, Instant};
 use legion::{system, systems::CommandBuffer, world::SubWorld, Query};
 
@@ -9,6 +12,7 @@ use srs2dge::prelude::*;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Asteroid {
+    pub seed: u64,
     pub size: Size,
     pub idx: Idx,
 }
@@ -48,6 +52,7 @@ pub fn spawn_asteroid(
     a_vel: f32,
     batcher: &mut BatchRenderer<MultiMesh>,
 ) -> (Transform2D, RigidBody2D, Asteroid, Collider) {
+    let mesh = AsteroidMesh::default();
     (
         Transform2D {
             translation: pos,
@@ -64,8 +69,9 @@ pub fn spawn_asteroid(
             angular_velocity: a_vel,
         },
         Asteroid {
+            seed: mesh.seed,
             size,
-            idx: batcher.push_with(MultiMesh::Asteroid(Default::default())),
+            idx: batcher.push_with(MultiMesh::Asteroid(mesh)),
         },
         Collider,
     )
@@ -78,9 +84,13 @@ fn asteroid_mesh(
     transform: &Transform2D,
     #[resource] batcher: &mut BatchRenderer<MultiMesh>,
 ) {
-    if let Some(MultiMesh::Asteroid(mesh)) = batcher.get_mut(asteroid.idx) {
-        mesh.lerp_transform = *transform;
-    }
+    batcher.modify(
+        MultiMesh::Asteroid(AsteroidMesh {
+            seed: asteroid.seed,
+            lerp_transform: *transform,
+        }),
+        asteroid.idx,
+    );
 }
 
 #[system]
